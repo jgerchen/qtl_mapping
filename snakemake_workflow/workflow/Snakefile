@@ -1,0 +1,469 @@
+configfile: "1A.yaml"
+import glob
+import os
+
+def aggregate_bam_files(wildcards):
+	glob_fastqs=glob.glob(config["fastq_path"]+"/*.1.fq.gz")
+	bam_files=[config["temp_files"]+"/"+i.split("/")[-1].replace("1.fq.gz", "bam") for i in glob_fastqs]
+	return bam_files
+
+rule index_genome_assembly:
+	input:
+		reference_genome=expand("{REF_GENOME}", REF_GENOME=config["reference_genome"])
+	output:
+		expand("{REF_GENOME}.amb", REF_GENOME=config["reference_genome"]),
+		expand("{REF_GENOME}.ann", REF_GENOME=config["reference_genome"]),
+		expand("{REF_GENOME}.bwt", REF_GENOME=config["reference_genome"]),
+		expand("{REF_GENOME}.pac", REF_GENOME=config["reference_genome"]),
+		expand("{REF_GENOME}.sa", REF_GENOME=config["reference_genome"]),
+	log:
+		"logs/index_genome_assembly/"+config["reference_genome"]+".log"
+	threads: 1
+	resources:
+		mem_mb = 16000,
+		runtime = "2:00:00"
+	shell:
+		"""
+		bwa index {config[reference_genome]}
+		"""
+
+rule align_bwa:
+	input:
+		ref_genome=expand("{REF_GENOME}", REF_GENOME=config["reference_genome"]),
+		ref1=expand("{REF_GENOME}.amb", REF_GENOME=config["reference_genome"]),
+		ref2=expand("{REF_GENOME}.ann", REF_GENOME=config["reference_genome"]),
+		ref3=expand("{REF_GENOME}.bwt", REF_GENOME=config["reference_genome"]),
+		ref4=expand("{REF_GENOME}.pac", REF_GENOME=config["reference_genome"]),
+		ref5=expand("{REF_GENOME}.sa", REF_GENOME=config["reference_genome"]),
+		fwd_reads=expand("{FASTQ_PATH}/{{sample}}.1.fq.gz", FASTQ_PATH=config["fastq_path"]),
+		rev_reads=expand("{FASTQ_PATH}/{{sample}}.2.fq.gz", FASTQ_PATH=config["fastq_path"])
+	output:
+		temp(expand("{TEMP_PATH}/{{sample}}.bam", TEMP_PATH=config["temp_files"]))
+		#temp(expand("{TEMP_PATH}/{{sample}}.bam.bai", TEMP_PATH=config["temp_files"]))
+	log:
+		"logs/align_bwa/{sample}.log"
+	threads: 6
+	resources:
+		mem_mb = 16000,
+		runtime = "8:00:00"
+	shell:
+		"""
+		bwa mem -t {threads} -R '@RG\\tID:{wildcards.sample}\\tSM:{wildcards.sample}' {input.ref_genome} {input.fwd_reads} {input.rev_reads} | samtools view -b -h | samtools sort -o {output} -
+		samtools index {output}
+		"""
+	
+rule gstacks:
+	input:
+		aggregate_bam_files
+	output:
+		directory(expand("{STACKS_OUT}/{{cross}}", STACKS_OUT=config["stacks_out"]))
+	log:
+		"logs/gstacks/{cross}.log"
+	threads: 10
+	resources:
+		mem_mb = 300000,
+		runtime = "24:00:00"
+	shell:
+		"""
+		if [ -f  {config[temp_files]}/{wildcards.cross}.popmap ]
+		then
+			rm {config[temp_files]}/{wildcards.cross}.popmap
+		fi
+		for i in {input}
+		do
+			bamfile=${{i#{config[temp_files]}/}}
+			echo -e ${{bamfile%.bam}}\"\\t1\"  >> {config[temp_files]}/{wildcards.cross}.popmap 
+		done
+		{config[stacks_dir]}/gstacks -I {config[temp_files]} -M {config[temp_files]}/{wildcards.cross}.popmap -O {output} -t 10
+		"""
+rule populations:
+	input:
+		expand("{STACKS_OUT}/{{cross}}", STACKS_OUT=config["stacks_out"])
+	output:
+		expand("{TEMP_FILES}/{{cross}}_populations", TEMP_FILES=config["temp_files"])	
+	log:
+		"logs/populations/{cross}.log"
+	threads: 16
+	resources:
+		mem_mb = 48000,
+		runtime = "24:00:00"
+	shell:
+		"""
+		{config[stacks_dir]}/populations -P {input} -R 0.5 --vcf -t 16
+		touch {output}
+		"""
+
+#remove low cov samples here and make PCA > make list of low cov samples by hand!
+
+rule make_pca:
+	input:
+		dummy_file=expand("{TEMP_FILES}/{{cross}}_populations", TEMP_FILES=config["temp_files"]),					
+		low_cov_samples=expand("{USER_INPUT}/{{cross}}_low_cov.lst", USER_INPUT=config["user_input"])					
+	output:
+		vcf_filtered=expand("{VCF_DIR}/{{cross}}_low_cov_filtered.recode.vcf", VCF_DIR=config["vcf_dir"]),
+		pca=expand("{STATS_DIR}/{{cross}}_pca.pdf", STATS_DIR=config["stats_dir"])
+	log:
+		"logs/make_pca/{cross}.log"
+	threads: 6
+	resources:
+		mem_mb = 16000,
+		runtime = "4:00:00"
+	shell:
+		"""
+		unfiltered_vcf={config[stacks_out]}/{wildcards.cross}/populations.haps.vcf
+		sample_input={config[vcf_dir]}/{wildcards.cross}_low_cov_filtered.recode.vcf
+		if [ $(wc -l {input.low_cov_samples}) -eq 0 ]
+		then
+			cp $unfiltered_vcf $sample_input
+		else
+			vcftools --vcf $unfiltered_vcf --recode --remove {input.low_cov_samples} --out {config[vcf_dir]}/{wildcards.cross}_low_cov_filtered
+		fi
+		Rscript scripts/plot_pca.r {wildcards.cross} $sample_input {output.pca} {config[stats_dir]}/{wildcards.cross}_pca_titles.pdf {config[stats_dir]}/{wildcards.cross}_pca_table.tsv &> {log}
+		"""
+#Remove contaminated samples, filter for Maf>0.2 and bi-allelic sites and make RQTL input
+
+rule filter_again:
+	input:
+		vcf_filtered=expand("{VCF_DIR}/{{cross}}_low_cov_filtered.recode.vcf", VCF_DIR=config["vcf_dir"]),
+		contam_samples=expand("{USER_INPUT}/{{cross}}_contam.lst", USER_INPUT=config["user_input"])
+	output:
+		vcf_filtered_2=expand("{VCF_DIR}/{{cross}}_low_cov_filtered_2.recode.vcf", VCF_DIR=config["vcf_dir"]),
+	log:
+		"logs/make_rqtl/{cross}.log"
+	threads: 1
+	resources:
+		mem_mb = 16000,
+		runtime = "4:00:00"
+	shell:
+		"""
+		if [ $(wc -l {input.contam_samples}) -eq 0 ]
+		then
+			cp {input.vcf_filtered} {output.vcf_filtered_2}
+		else
+			vcftools --vcf {input.vcf_filtered} --recode --remove {input.contam_samples} --maf 0.2 --min-alleles 2 --out {config[vcf_dir]}/{wildcards.cross}_low_cov_filtered_2
+		fi
+	"""
+rule lepmap_make_ped:
+	input:
+		expand("{VCF_DIR}/{{cross}}_low_cov_filtered_2.recode.vcf", VCF_DIR=config["vcf_dir"])
+	output:
+		expand("{LEP_DIR}/{{cross}}.ped", LEP_DIR=config["lep_dir"])
+	log:
+		"logs/lepmap_make_ped/{cross}.log"
+	threads: 1
+	resources:
+		mem_mb = 16000,
+		runtime = "4:00:00"
+	run:
+		offspring=[]
+		ancestors=(config["male_grandparent"], config["female_grandparent"], config["F1"])
+		samples=[]
+		with open(input[0]) as vcf_file:
+			for line in vcf_file:
+				if line[0]=="#" and line[1]!="#":
+					samples=line.strip().split("\t")[9:]
+					for sample in samples:
+						if sample not in ancestors:
+							offspring.append(sample)
+					break
+		with open(output[0], "w") as output_ped:
+			output_ped.write("CHR\tPOS\t"+"\t".join([wildcards.cross for i in range(len(samples)+1)])+"\n")
+			output_ped.write("CHR\tPOS\t"+config["male_grandparent"]+"\t"+config["female_grandparent"]+"\t"+config["F1"]+"\t"+config["F1"]+"_d"+"\t"+"\t".join(offspring)+"\n")
+			output_ped.write("CHR\tPOS\t0\t0\t"+config["male_grandparent"]+"\t"+config["male_grandparent"]+"\t"+"\t".join([config["F1"] for i in offspring])+"\n")
+			output_ped.write("CHR\tPOS\t0\t0\t"+config["female_grandparent"]+"\t"+config["female_grandparent"]+"\t"+"\t".join([config["F1"]+"_d" for i in offspring])+"\n")
+			output_ped.write("CHR\tPOS\t1\t2\t1\t2\t"+"\t".join(["0" for i in offspring])+"\n")
+			output_ped.write("CHR\tPOS\t0\t0\t0\t0\t"+"\t".join(["0" for i in offspring])+"\n")
+
+
+#1: parent call
+rule lepmap_parent_call_and_filter:
+	input:
+		vcf_file=expand("{VCF_DIR}/{{cross}}_low_cov_filtered_2.recode.vcf", VCF_DIR=config["vcf_dir"]),
+		ped_file=expand("{LEP_DIR}/{{cross}}.ped", LEP_DIR=config["lep_dir"])
+	output:
+		parent_call=expand("{LEP_DIR}/{{cross}}.call", LEP_DIR=config["lep_dir"])
+		#parent_call_filtered=expand("{LEP_DIR}/{{cross}}_filtered.call", LEP_DIR=config["lep_dir"])
+	log:
+		"logs/lepmap_parent_call_and_filter/{cross}.log"
+	threads: 1
+	resources:
+		mem_mb = 16000,
+		runtime = "4:00:00"
+	shell:
+		"""
+		java -cp {config[lepmap_bin]} ParentCall2 data={input.ped_file} vcfFile={input.vcf_file} > {output.parent_call}
+		"""
+#2: try to estimate distances directly?
+rule get_loci_per_chrom:
+	input:
+		parent_call=expand("{LEP_DIR}/{{cross}}.call", LEP_DIR=config["lep_dir"])
+	output:
+		directory(expand("{LEP_DIR}/{{cross}}_chrom_loci", LEP_DIR=config["lep_dir"]))
+	log:
+		"logs/get_loci_per_chrom/{cross}.log"
+	threads: 1
+	resources:
+		mem_mb = 16000,
+		runtime = "4:00:00"
+	run:
+		with open(input[0]) as p_call:
+			os.makedirs(output[0], exist_ok = True)
+			chroms=set()
+			site_counter=0
+			first_chrom=True
+			for line in p_call:
+				if line[0]=="O":
+					curr_chrom=line.strip().split("\t")[0]
+					if curr_chrom not in chroms:
+						chroms.add(curr_chrom)
+						if first_chrom==True:
+							output_file=open(output[0]+"/"+curr_chrom,"w")
+							first_chrom=False
+						else:
+							output_file.close()
+							output_file=open(output[0]+"/"+curr_chrom,"w")
+					site_counter+=1
+					output_file.write(str(site_counter)+"\n")
+			output_file.close()
+#make physical linkage map
+rule lepmap_make_physical_map:
+	input:
+		parent_call=expand("{LEP_DIR}/{{cross}}.call", LEP_DIR=config["lep_dir"]),
+		cross_chrom_dir=expand("{LEP_DIR}/{{cross}}_chrom_loci", LEP_DIR=config["lep_dir"])
+	output:
+		physical_map_dir=directory(expand("{LEP_DIR}/{{cross}}_physical", LEP_DIR=config["lep_dir"]))
+	log:
+		"logs/lepmap_make_physical_map/{cross}.log"
+
+	threads: 1
+	resources:
+		mem_mb=16000,
+		runtime = "4:00:00"
+	shell:
+		"""
+		mkdir {output.physical_map_dir}
+		for cross_chrom in {input.cross_chrom_dir}/*
+		do
+			java -cp {config[lepmap_bin]} OrderMarkers2 evaluateOrder=$cross_chrom data={input.parent_call} improveOrder=0 sexAveraged=1 > {output.physical_map_dir}/${{cross_chrom#{config[lep_dir]}/{wildcards.cross}_chrom_loci/}}
+		done
+		"""
+
+#make new linkage map
+
+rule lepmap_make_genetic_map:
+	input:
+		parent_call=expand("{LEP_DIR}/{{cross}}.call", LEP_DIR=config["lep_dir"]),
+		cross_chrom_dir=expand("{LEP_DIR}/{{cross}}_chrom_loci", LEP_DIR=config["lep_dir"])
+	output:
+		genetic_map_dir=directory(expand("{LEP_DIR}/{{cross}}_genetic", LEP_DIR=config["lep_dir"]))
+	log:
+		"logs/lepmap_make_genetic_map/{cross}.log"
+
+	threads: 1
+	resources:
+		mem_mb=16000,
+		runtime = "8:00:00"
+	shell:
+		"""
+		mkdir {output.genetic_map_dir}
+		for cross_chrom in {input.cross_chrom_dir}/*
+		do
+			java -cp {config[lepmap_bin]} OrderMarkers2 evaluateOrder=$cross_chrom data={input.parent_call} improveOrder=1 sexAveraged=1 > {output.genetic_map_dir}/${{cross_chrom#{config[lep_dir]}/{wildcards.cross}_chrom_loci/}}
+		done
+		"""
+#compare both linkage maps
+
+rule compare_maps:
+	input:
+		genetic_map_dir=expand("{LEP_DIR}/{{cross}}_genetic", LEP_DIR=config["lep_dir"]),
+		physical_map_dir=expand("{LEP_DIR}/{{cross}}_physical", LEP_DIR=config["lep_dir"])
+	output:
+		map_comp=expand("{LEP_DIR}/{{cross}}_physical_genetic_map_comp.tsv", LEP_DIR=config["lep_dir"])
+
+	log:
+		"logs/lepmap_compare_maps/{cross}.log"
+	threads: 1
+	resources:
+		mem_mb=2000,
+		runtime = "1:00:00"
+	run:
+		with open(output[0], "w") as out_tsv:
+			for p_chrom in glob.glob(input["physical_map_dir"][0]+"/*"):
+					p_chrom_id=p_chrom.split("/")[-1]
+					p_chrom_dict={}
+					with open(p_chrom) as p_chrom_file:
+						for p_line in p_chrom_file:
+							if p_line[0]!="#":
+								p_line_cats=p_line.strip().split("\t")
+								p_chrom_dict.update({p_line_cats[0]:p_line_cats[1]})
+					g_chrom=input["genetic_map_dir"][0]+"/"+p_chrom_id
+					with open(g_chrom) as g_chrom_file:
+						for g_line in g_chrom_file:
+							if g_line[0]!="#":
+								g_line_cats=g_line.strip().split("\t")
+								if g_line_cats[0] in p_chrom_dict:
+									out_tsv.write("%s\t%s\t%s\t%s\n" % (p_chrom_id,g_line_cats[0], p_chrom_dict[g_line_cats[0]], g_line_cats[1]))
+
+#manual: make list of loci to discard
+
+
+#estimate new map from remaining loci with grandparent phase
+
+rule lepmap_gp_phase:
+	input:
+		parent_call=expand("{LEP_DIR}/{{cross}}.call", LEP_DIR=config["lep_dir"]),
+		cross_chrom_dir_filtered=expand("{USER_INPUT}/{{cross}}_chrom_loci_filtered", USER_INPUT=config["user_input"])
+	output:
+		gp_phase_dir=directory(expand("{LEP_DIR}/{{cross}}_gp_phase", LEP_DIR=config["lep_dir"]))
+	log:
+		"logs/lepmap_gp_phase/{cross}.log"
+
+	threads: 1
+	resources:
+		mem_mb=16000,
+		runtime = "8:00:00"
+	shell:
+		"""
+		mkdir {output.gp_phase_dir}
+		for cross_chrom in {input.cross_chrom_dir_filtered}/*
+		do
+			java -cp {config[lepmap_bin]} OrderMarkers2 evaluateOrder=$cross_chrom data={input.parent_call} improveOrder=0 sexAveraged=1 outputPhasedData=1 grandparentPhase=1 > {output.gp_phase_dir}/${{cross_chrom#{config[user_input]}/{wildcards.cross}_chrom_loci_filtered/}}
+		done
+		"""
+
+#estimate new map from loci without grandparent phase
+
+rule no_gp_phase:
+	input:
+		parent_call=expand("{LEP_DIR}/{{cross}}.call", LEP_DIR=config["lep_dir"]),
+		cross_chrom_dir_filtered=expand("{USER_INPUT}/{{cross}}_chrom_loci_filtered", USER_INPUT=config["user_input"])
+	output:
+		gp_no_phase_dir=directory(expand("{LEP_DIR}/{{cross}}_gp_no_phase", LEP_DIR=config["lep_dir"]))
+	log:
+		"logs/lepmap_no_gp_phase/{cross}.log"
+
+	threads: 1
+	resources:
+		mem_mb=16000,
+		runtime = "8:00:00"
+	shell:
+		"""
+		mkdir {output.gp_no_phase_dir}
+		for cross_chrom in {input.cross_chrom_dir_filtered}/*
+		do
+			java -cp {config[lepmap_bin]} OrderMarkers2 evaluateOrder=$cross_chrom data={input.parent_call} improveOrder=0 sexAveraged=1 outputPhasedData=1 grandparentPhase=0 > {output.gp_no_phase_dir}/${{cross_chrom#{config[user_input]}/{wildcards.cross}_chrom_loci_filtered/}}
+
+		done
+		"""
+
+#impute grandparent phase for loci wo grandparent phase
+
+rule impute_phase:
+	input:
+		gp_no_phase_dir=expand("{LEP_DIR}/{{cross}}_gp_no_phase", LEP_DIR=config["lep_dir"]),
+		gp_phase_dir=expand("{LEP_DIR}/{{cross}}_gp_phase", LEP_DIR=config["lep_dir"]),
+		parent_call=expand("{LEP_DIR}/{{cross}}.call", LEP_DIR=config["lep_dir"])
+	output:
+		gp_impute_dir=directory(expand("{LEP_DIR}/{{cross}}_gp_impute", LEP_DIR=config["lep_dir"])),
+		gp_genotypes=directory(expand("{LEP_DIR}/{{cross}}_genotypes", LEP_DIR=config["lep_dir"])),
+		pc_snps=expand("{LEP_DIR}/{{cross}}.snps", LEP_DIR=config["lep_dir"])
+	log:
+		"logs/lepmap_impute_phase/{cross}.log"
+
+	threads: 1
+	resources:
+		mem_mb=16000,
+		runtime = "8:00:00"
+	shell:
+		"""
+		mkdir {output.gp_impute_dir}
+		mkdir {output.gp_genotypes}
+		for gp_phase_chrom in {input.gp_phase_dir}/*
+		do
+			chrom_id=${{gp_phase_chrom#{config[lep_dir]}/{wildcards.cross}_gp_phase/}}
+			awk -f scripts/lepmap/phasematch.awk $gp_phase_chrom {config[lep_dir]}/{wildcards.cross}_gp_no_phase/$chrom_id > {output.gp_impute_dir}/$chrom_id
+			awk -f scripts/lepmap/map2genotypes.awk {output.gp_impute_dir}/$chrom_id > {output.gp_genotypes}/$chrom_id
+			cut -f 1,2 {input.parent_call} |awk '(NR>=7)' >{output.pc_snps}
+			awk -vFS=\"\\t\" -vOFS=\"\\t\" '(NR==FNR){{s[NR-1]=$0}}(NR!=FNR){{if ($1 in s) $1=s[$1];print}}' {output.pc_snps} {output.gp_genotypes}/$chrom_id >{output.gp_genotypes}/${{chrom_id}}.genloc
+			
+		done
+		"""
+
+#get phased results for QTL analyis and turn them into rQTL format
+
+rule make_rqtl_input:
+	input:
+		gp_genotypes=expand("{LEP_DIR}/{{cross}}_genotypes", LEP_DIR=config["lep_dir"]),
+		gp_ped=expand("{LEP_DIR}/{{cross}}.ped", LEP_DIR=config["lep_dir"]),
+		phen=config["phenotypes"]
+	output:
+		rqtl_out=expand("{LEP_DIR}/{{cross}}.csvr", LEP_DIR=config["lep_dir"])
+	log:
+		"logs/make_rqtl_input/{cross}.log"
+	threads: 1
+	resources:
+		mem_mb=16000,
+		runtime = "8:00:00"
+	run:
+		import glob
+		#get ids in correct order
+		inds_genotype=[]
+		with open(input.gp_ped[0]) as input_ped:
+			ped_first_line=input_ped.readline()
+			ped_second_line=input_ped.readline().strip().split("\t")
+			ped_third_line=input_ped.readline()
+			ped_fourth_line=input_ped.readline()
+			ped_fifth_line=input_ped.readline().strip().split("\t")
+		for ped_f_i in range(len(ped_fifth_line)):
+			if ped_fifth_line[ped_f_i]=="0":
+				inds_genotype.append(ped_second_line[ped_f_i])
+		inds_genotype_set=set(inds_genotype)
+		#get ids from phenotype data
+		inds_phenotype={}
+
+		with open(input.phen) as input_phen:
+			phenotypes=input_phen.readline().strip().split(",")[1:]
+			for phen_line in input_phen:
+				phen_cats=phen_line.strip().split(",")
+				if phen_cats[0] in inds_genotype_set:
+					inds_phenotype.update({phen_cats[0]:phen_cats[1:]})
+		with open(output.rqtl_out[0], "w") as rqtl_out:
+			#plot ids
+			toprow_string="id,,"
+			for gen_ind in inds_genotype:
+				if gen_ind in inds_phenotype:
+					toprow_string+=","+gen_ind
+			toprow_string+="\n"
+			rqtl_out.write(toprow_string)
+			#plot phenotypes
+			for phenotype_i in range(len(phenotypes)):
+				phen_string=phenotypes[phenotype_i]+",,"
+				for gen_ind in inds_genotype:
+					if gen_ind in inds_phenotype:
+						phen_string+=","+inds_phenotype[gen_ind][phenotype_i]
+
+				phen_string+="\n"
+				rqtl_out.write(phen_string)
+			#iterate over chromosomes and plot genotypes
+			#-> find subset with phenotypes for each row
+			genotype_dict=input.gp_genotypes[0]
+			chrom_dict={"OW569312.1":"Lg3", "OW569313.1":"Lg2", "OW569314.1":"Lg5", "OW569315.1":"Lg7", "OW569316.1":"Lg6", "OW569317.1":"Lg4", "OW569318.1":"Lg8", "OW569319.1":"Lg1",}
+			gt_files=glob.glob(genotype_dict+"/*.genloc")
+			def get_lg(contig):
+				contig_key=contig.strip().split("/")[-1].replace(".genloc", "")
+				return(chrom_dict[contig_key])
+			gt_files.sort(key=get_lg)
+			gt_dict={"1 1":"A", "2 2":"B", "1 2":"H", "2 1":"H"}
+			for gt_file in gt_files:
+				with open(gt_file) as gt_input:
+					for gt_line in gt_input:
+						gt_cats=gt_line.strip().split("\t")
+						gt_locus=gt_cats[0]+"_"+gt_cats[1]
+						gt_cm=gt_cats[3]
+						gt_string=gt_locus+","+chrom_dict[gt_cats[0]]+","+gt_cm
+						gt_genotypes=gt_cats[5:]
+						for g_ind_id in range(len(inds_genotype)):
+							if inds_genotype[g_ind_id] in inds_phenotype:
+								gt_string+=","+gt_dict[gt_genotypes[g_ind_id]]
+						gt_string+="\n"
+						rqtl_out.write(gt_string)

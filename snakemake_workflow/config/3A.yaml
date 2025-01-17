@@ -1,0 +1,15 @@
+reference_genome: ../resources/reference/GCA_937616625.1_ddMerAnnu1.1_genomic.fna
+fastq_path: /users/jgerchen/scratch/qtl/3A/fastqs
+temp_files: /users/jgerchen/scratch/qtl/3A/tmp
+user_input: /users/jgerchen/scratch/qtl/3A/user_input
+cross_name: 3A
+stacks_dir: ../resources/software/stacks-2.62
+stacks_out: /users/jgerchen/scratch/qtl/3A/stacks_out
+stats_dir: /users/jgerchen/scratch/qtl/3A/stats
+vcf_dir: /users/jgerchen/scratch/qtl/3A/vcf
+lep_dir: /users/jgerchen/scratch/qtl/3A/lm
+male_grandparent: 3A_F0_P
+female_grandparent: 3A_F0_M
+F1: 3A_F1
+lepmap_bin: ../resources/software/lepmap/bin
+phenotypes: /users/jgerchen/scratch/qtl/3A/user_input/3A_rqtl.phen
