@@ -8,6 +8,6 @@ Jörn F. Gerchen, Nora Villamil-Buenrostro, Xinji Li, Ehouarn Le Faou, John R. P
 
 bioRxiv 2024.12.11.627930; doi: https://doi.org/10.1101/2024.12.11.627930
 
-
-- folder rqtl contains R scripts and data used for QTL analyses
-- folder snakemake_workflow contains a Snakemake workflow used to generate linkage maps and rqtl input
+- File crosses_table.xlsx contains information on all four crosses, with phenotypes and Biosample accession
+- Folder rqtl contains R scripts and data used for QTL analyses
+- Folder snakemake_workflow contains a Snakemake workflow used to generate linkage maps and rqtl input
