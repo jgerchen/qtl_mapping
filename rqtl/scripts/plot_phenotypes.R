@@ -3,7 +3,7 @@ library(viridis)
 library(colourvalues)
 library(fields)
 #Plots 1A
-setwd("~/Desktop/qtl_paper/upload_suppl_information/rqtl/")
+setwd("/media/fredo/11a4cb61-5b90-4af8-b4fe-0296472c7fb1/home/fredo/Desktop_overflow/qtl_paper/upload_suppl_information/rqtl/")
 phenotypes_1A<-read.table("data/1A_phenotypes.tsv", sep="\t", header=TRUE)
 Seq_depth_1A<-read.table("data/1A_coverage.tsv", sep="\t", header=TRUE)
 low_depth_1A<-Seq_depth_1A$sample[Seq_depth_1A$mean_cov<10]
@@ -62,12 +62,19 @@ pdf("plots/phenotypes.pdf", width=8, height=6)
   
   plot(phenotypes_1A$FRE, phenotypes_1A$MRE, pch=phenotypes_1A$symbol,  ylab="", col=rgb(ehouarn_color(phenotypes_1A$rMA), maxColorValue = 255), xlim=c(0, FRE_max), ylim=c(0, MRE_max), xlab="")
   title("Cross 1")
-  
+  text(0.07,0.096, paste("n = ",as.character(nrow(phenotypes_1A)),sep=""), cex=1.5)
   par(mar = c(5.1, 0, 4.1, 0))
   plot(phenotypes_S1$FRE, phenotypes_S1$MRE, pch=phenotypes_S1$symbol, col=rgb(ehouarn_color(phenotypes_S1$rMA), maxColorValue = 255), xlim=c(0, FRE_max), ylim=c(0, MRE_max), xlab="", ylab="", yaxt='n')
+  text(0.07,0.096, paste("n = ",as.character(nrow(phenotypes_S1)),sep=""), cex=1.5)
+  
+  
+  
+  
   title("Cross 2")
   
   plot(phenotypes_3A$FRE, phenotypes_3A$MRE, pch=phenotypes_3A$symbol,  col=rgb(ehouarn_color(phenotypes_3A$rMA), maxColorValue = 255), xlim=c(0, FRE_max), ylim=c(0, MRE_max), xlab="", ylab="", yaxt='n')
+  text(0.07,0.096, paste("n = ",as.character(nrow(phenotypes_3A)),sep=""), cex=1.5)
+  
   title("Cross 3")
   
   plot(phenotypes_5A$FRE, phenotypes_5A$MRE, pch=phenotypes_5A$symbol,  col=rgb(ehouarn_color(phenotypes_5A$rMA), maxColorValue = 255), xlim=c(0, FRE_max), ylim=c(0, MRE_max), xlab="", ylab="", yaxt='n')
@@ -80,5 +87,7 @@ pdf("plots/phenotypes.pdf", width=8, height=6)
   colorbar.plot(0.15,0.07,(1:100)/100, col=rgb(ehouarn_color((1:100)/100), maxColorValue = 255), horizontal=FALSE)
   text(0.135,0.077, "1")
   text(0.135,0.063, "0")
+  text(0.05,0.096, paste("n = ",as.character(nrow(phenotypes_5A)),sep=""), cex=1.5)
+  
   
 dev.off()

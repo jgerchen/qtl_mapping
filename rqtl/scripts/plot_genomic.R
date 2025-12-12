@@ -1,4 +1,4 @@
-setwd("/home/fredo/Desktop/qtl_paper/upload_suppl_information/rqtl/")
+setwd("/media/fredo/11a4cb61-5b90-4af8-b4fe-0296472c7fb1/home/fredo/Desktop_overflow/qtl_paper/upload_suppl_information/rqtl/")
 library(qtl)
 library(stringr)
 #Genome information
@@ -10,6 +10,19 @@ library(stringr)
 #Chr6 OW569316.1: 47723244 
 #Chr7 OW569315.1: 50031057 
 #Chr8 OW569318.1: 43611580
+
+
+col_FRE="#E69F00"
+rgb_FRE=rgb(0.9,0.62,0, alpha=0.5)
+col_MRE="#56B4E9"
+rgb_MRE=rgb(0.34,0.71,0.91, alpha=0.5)
+col_rMA="#009E73"
+rgb_rMA=rgb(0,0.62,0.45, alpha=0.5)
+
+col_AA="#0072B2"
+col_BB="#CC79A7"
+
+
 
 genome_info_df<-data.frame(chr=c("Chr1","Chr2","Chr3","Chr4","Chr5","Chr6","Chr7","Chr8"),
                            Lg=c("OW569319.1","OW569313.1","OW569312.1","OW569317.1","OW569314.1","OW569316.1","OW569315.1","OW569318.1"),
@@ -98,8 +111,8 @@ cross_1A_FRE_qtl1_right_edge<-cross_1A_df[as.character(cross_1A_df$id)==as.chara
 cross_1A_FRE_qtl1_lines_df<-cross_1A_df[as.character(cross_1A_df$chrom)==cross_1A_FRE_qtl1_left_edge$chrom[1] & cross_1A_df$pos_cum>=cross_1A_FRE_qtl1_left_edge$pos_cum[1] & cross_1A_df$pos_cum<=cross_1A_FRE_qtl1_right_edge$pos_cum[1],]
 cross_1A_FRE_qtl1_lines_AA<-lines(cross_1A_FRE_qtl1_lines_df$pos_cum, cross_1A_FRE_qtl1_lines_df$FRE_mean_AA, col="black", lwd=0)
 cross_1A_FRE_qtl1_lines_BB<-lines(cross_1A_FRE_qtl1_lines_df$pos_cum, cross_1A_FRE_qtl1_lines_df$FRE_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_1A_FRE_qtl1_lines_df$pos_cum, rev(cross_1A_FRE_qtl1_lines_df$pos_cum)), y=c(cross_1A_FRE_qtl1_lines_df$FRE_mean_BB, rev(cross_1A_FRE_qtl1_lines_df$FRE_mean_AA)),  col=rgb(0,0,1.0,alpha=0.5), lty=0)
-abline(v=cross_1A_FRE_qtl1_center$pos_cum, col="blue", lty=2, lwd=2)
+polygon(x=c(cross_1A_FRE_qtl1_lines_df$pos_cum, rev(cross_1A_FRE_qtl1_lines_df$pos_cum)), y=c(cross_1A_FRE_qtl1_lines_df$FRE_mean_BB, rev(cross_1A_FRE_qtl1_lines_df$FRE_mean_AA)),  col=rgb_FRE, lty=0)
+abline(v=cross_1A_FRE_qtl1_center$pos_cum, col=col_FRE, lty=2, lwd=2)
 
 #QTL2
 cross_1A_FRE_qtl2_left_edge<-cross_1A_df[as.character(cross_1A_df$id)==as.character(cross_1A_qtls$begin[2]),]
@@ -108,15 +121,15 @@ cross_1A_FRE_qtl2_right_edge<-cross_1A_df[as.character(cross_1A_df$id)==as.chara
 cross_1A_FRE_qtl2_lines_df<-cross_1A_df[as.character(cross_1A_df$chrom)==cross_1A_FRE_qtl2_left_edge$chrom[1] & cross_1A_df$pos_cum>=cross_1A_FRE_qtl2_left_edge$pos_cum[1] & cross_1A_df$pos_cum<=cross_1A_FRE_qtl2_right_edge$pos_cum[1],]
 cross_1A_FRE_qtl2_lines_AA<-lines(cross_1A_FRE_qtl2_lines_df$pos_cum, cross_1A_FRE_qtl2_lines_df$FRE_mean_AA, col="black", lwd=0)
 cross_1A_FRE_qtl2_lines_BB<-lines(cross_1A_FRE_qtl2_lines_df$pos_cum, cross_1A_FRE_qtl2_lines_df$FRE_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_1A_FRE_qtl2_lines_df$pos_cum, rev(cross_1A_FRE_qtl2_lines_df$pos_cum)), y=c(cross_1A_FRE_qtl2_lines_df$FRE_mean_AA, rev(cross_1A_FRE_qtl2_lines_df$FRE_mean_BB)),  col=rgb(0,0,1.0,alpha=0.5), lty=0)
-abline(v=cross_1A_FRE_qtl2_center$pos_cum, col="blue", lty=2, lwd=2)
+polygon(x=c(cross_1A_FRE_qtl2_lines_df$pos_cum, rev(cross_1A_FRE_qtl2_lines_df$pos_cum)), y=c(cross_1A_FRE_qtl2_lines_df$FRE_mean_AA, rev(cross_1A_FRE_qtl2_lines_df$FRE_mean_BB)),  col=rgb_FRE, lty=0)
+abline(v=cross_1A_FRE_qtl2_center$pos_cum, col=col_FRE, lty=2, lwd=2)
 
 abline(h=mean(phenotypes_1A$FRE), lty=2)
 abline(v=genome_info_df$cum_size)
 for(chr_i in 1:8){
-  lines(cross_1A_df$pos_cum[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], cross_1A_df$FRE_mean_AA[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], col="red", lwd=2)
+  lines(cross_1A_df$pos_cum[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], cross_1A_df$FRE_mean_AA[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], col=col_AA, lwd=2)
   lines(cross_1A_df$pos_cum[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], cross_1A_df$FRE_mean_AB[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], lwd=2)
-  lines(cross_1A_df$pos_cum[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], cross_1A_df$FRE_mean_BB[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], col="blue", lwd=2) 
+  lines(cross_1A_df$pos_cum[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], cross_1A_df$FRE_mean_BB[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], col=col_BB, lwd=2) 
 }
 
 
@@ -136,8 +149,8 @@ cross_1A_MRE_qtl3_lines_AA<-lines(cross_1A_MRE_qtl3_lines_df$pos_cum, cross_1A_M
 cross_1A_MRE_qtl3_lines_BB<-lines(cross_1A_MRE_qtl3_lines_df$pos_cum, cross_1A_MRE_qtl3_lines_df$MRE_mean_BB, col="black", lwd=0)
 polygon(x=c(cross_1A_MRE_qtl3_lines_df$pos_cum, rev(cross_1A_MRE_qtl3_lines_df$pos_cum)), 
         y=c(cross_1A_MRE_qtl3_lines_df$MRE_mean_BB, 
-        rev(cross_1A_MRE_qtl3_lines_df$MRE_mean_AA)),  col=rgb(1,0,0.0,alpha=0.5), lty=0)
-abline(v=cross_1A_MRE_qtl3_center$pos_cum, col="red", lty=2, lwd=2)
+        rev(cross_1A_MRE_qtl3_lines_df$MRE_mean_AA)),  col=rgb_MRE, lty=0)
+abline(v=cross_1A_MRE_qtl3_center$pos_cum, col=col_MRE, lty=2, lwd=2)
 
 #QTL4
 
@@ -150,8 +163,8 @@ cross_1A_MRE_qtl4_lines_AA<-lines(cross_1A_MRE_qtl4_lines_df$pos_cum, cross_1A_M
 cross_1A_MRE_qtl4_lines_BB<-lines(cross_1A_MRE_qtl4_lines_df$pos_cum, cross_1A_MRE_qtl4_lines_df$MRE_mean_BB, col="black", lwd=0)
 polygon(x=c(cross_1A_MRE_qtl4_lines_df$pos_cum, rev(cross_1A_MRE_qtl4_lines_df$pos_cum)), 
         y=c(cross_1A_MRE_qtl4_lines_df$MRE_mean_BB, 
-            rev(cross_1A_MRE_qtl4_lines_df$MRE_mean_AA)),  col=rgb(1,0,0.0,alpha=0.5), lty=0)
-abline(v=cross_1A_MRE_qtl4_center$pos_cum, col="red", lty=2, lwd=2)
+            rev(cross_1A_MRE_qtl4_lines_df$MRE_mean_AA)),  col=rgb_MRE, lty=0)
+abline(v=cross_1A_MRE_qtl4_center$pos_cum, col=col_MRE, lty=2, lwd=2)
 
 #QTL5
 
@@ -165,18 +178,18 @@ cross_1A_MRE_qtl5_lines_AA<-lines(cross_1A_MRE_qtl5_lines_df$pos_cum, cross_1A_M
 cross_1A_MRE_qtl5_lines_BB<-lines(cross_1A_MRE_qtl5_lines_df$pos_cum, cross_1A_MRE_qtl5_lines_df$MRE_mean_BB, col="black", lwd=0)
 polygon(x=c(cross_1A_MRE_qtl5_lines_df$pos_cum, rev(cross_1A_MRE_qtl5_lines_df$pos_cum)), 
         y=c(cross_1A_MRE_qtl5_lines_df$MRE_mean_AA, 
-            rev(cross_1A_MRE_qtl5_lines_df$MRE_mean_BB)),  col=rgb(1,0,0.0,alpha=0.5), 
+            rev(cross_1A_MRE_qtl5_lines_df$MRE_mean_BB)),  col=rgb_MRE, 
           lty=1,
         density=30,
         angle=45)
-abline(v=cross_1A_MRE_qtl5_center$pos_cum, col="red", lty=2, lwd=2)
+abline(v=cross_1A_MRE_qtl5_center$pos_cum, col=col_MRE, lty=2, lwd=2)
 
 abline(h=mean(phenotypes_1A$MRE), lty=2)
 abline(v=genome_info_df$cum_size)
 for(chr_i in 1:8){
-  lines(cross_1A_df$pos_cum[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], cross_1A_df$MRE_mean_AA[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], col="red", lwd=2)
+  lines(cross_1A_df$pos_cum[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], cross_1A_df$MRE_mean_AA[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], col=col_AA, lwd=2)
   lines(cross_1A_df$pos_cum[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], cross_1A_df$MRE_mean_AB[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], lwd=2)
-  lines(cross_1A_df$pos_cum[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], cross_1A_df$MRE_mean_BB[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], col="blue", lwd=2) 
+  lines(cross_1A_df$pos_cum[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], cross_1A_df$MRE_mean_BB[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], col=col_BB, lwd=2) 
 }
 
 
@@ -197,8 +210,8 @@ cross_1A_rMA_qtl6_lines_AA<-lines(cross_1A_rMA_qtl6_lines_df$pos_cum, cross_1A_r
 cross_1A_MRE_qtl6_lines_BB<-lines(cross_1A_rMA_qtl6_lines_df$pos_cum, cross_1A_rMA_qtl6_lines_df$rMA_mean_BB, col="black", lwd=0)
 polygon(x=c(cross_1A_rMA_qtl6_lines_df$pos_cum, rev(cross_1A_rMA_qtl6_lines_df$pos_cum)), 
         y=c(cross_1A_rMA_qtl6_lines_df$rMA_mean_AA, 
-            rev(cross_1A_rMA_qtl6_lines_df$rMA_mean_BB)),  col=rgb(0,1,0.5,alpha=0.7), lty=0)
-abline(v=cross_1A_rMA_qtl6_center$pos_cum, col="darkgreen", lty=2, lwd=2)
+            rev(cross_1A_rMA_qtl6_lines_df$rMA_mean_BB)),  col=rgb_rMA, lty=0)
+abline(v=cross_1A_rMA_qtl6_center$pos_cum, col=col_rMA, lty=2, lwd=2)
 
 
 #QTL7
@@ -211,8 +224,8 @@ cross_1A_rMA_qtl7_lines_AA<-lines(cross_1A_rMA_qtl7_lines_df$pos_cum, cross_1A_r
 cross_1A_MRE_qtl7_lines_BB<-lines(cross_1A_rMA_qtl7_lines_df$pos_cum, cross_1A_rMA_qtl7_lines_df$rMA_mean_BB, col="black", lwd=0)
 polygon(x=c(cross_1A_rMA_qtl7_lines_df$pos_cum, rev(cross_1A_rMA_qtl7_lines_df$pos_cum)), 
         y=c(cross_1A_rMA_qtl7_lines_df$rMA_mean_AA, 
-            rev(cross_1A_rMA_qtl7_lines_df$rMA_mean_BB)),  col=rgb(0,1,0.5,alpha=0.5), lty=0)
-abline(v=cross_1A_rMA_qtl7_center$pos_cum, col="darkgreen", lty=2, lwd=2)
+            rev(cross_1A_rMA_qtl7_lines_df$rMA_mean_BB)),  col=rgb_rMA, lty=0)
+abline(v=cross_1A_rMA_qtl7_center$pos_cum, col=col_rMA, lty=2, lwd=2)
 
 #QTL8
 cross_1A_rMA_qtl8_left_edge<-cross_1A_df[as.character(cross_1A_df$id)==as.character(cross_1A_qtls$begin[8]),]
@@ -224,18 +237,18 @@ cross_1A_rMA_qtl8_lines_AA<-lines(cross_1A_rMA_qtl8_lines_df$pos_cum, cross_1A_r
 cross_1A_MRE_qtl8_lines_BB<-lines(cross_1A_rMA_qtl8_lines_df$pos_cum, cross_1A_rMA_qtl8_lines_df$rMA_mean_BB, col="black", lwd=0)
 polygon(x=c(cross_1A_rMA_qtl8_lines_df$pos_cum, rev(cross_1A_rMA_qtl8_lines_df$pos_cum)), 
         y=c(cross_1A_rMA_qtl8_lines_df$rMA_mean_AA, 
-            rev(cross_1A_rMA_qtl8_lines_df$rMA_mean_BB)),  col=rgb(0,1,0.5),
+            rev(cross_1A_rMA_qtl8_lines_df$rMA_mean_BB)),  col=rgb_rMA,
         lty=1,
         density=30,
         angle=45)
-abline(v=cross_1A_rMA_qtl8_center$pos_cum, col="darkgreen", lty=2, lwd=2)
+abline(v=cross_1A_rMA_qtl8_center$pos_cum, col=col_rMA, lty=2, lwd=2)
 
 abline(h=mean(phenotypes_1A$rMA), lty=2)
 abline(v=genome_info_df$cum_size)
 for(chr_i in 1:8){
-  lines(cross_1A_df$pos_cum[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], cross_1A_df$rMA_mean_AA[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], col="red", lwd=2)
+  lines(cross_1A_df$pos_cum[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], cross_1A_df$rMA_mean_AA[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], col=col_AA, lwd=2)
   lines(cross_1A_df$pos_cum[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], cross_1A_df$rMA_mean_AB[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], lwd=2)
-  lines(cross_1A_df$pos_cum[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], cross_1A_df$rMA_mean_BB[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], col="blue", lwd=2) 
+  lines(cross_1A_df$pos_cum[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], cross_1A_df$rMA_mean_BB[cross_1A_df$chrom==genome_info_df$Lg[chr_i]], col=col_BB, lwd=2) 
 }
 
 
@@ -363,16 +376,16 @@ cross_S1_FRE_qtl1_right_edge<-cross_S1_df[as.character(cross_S1_df$id)==as.chara
 cross_S1_FRE_qtl1_lines_df<-cross_S1_df[as.character(cross_S1_df$chrom)==cross_S1_FRE_qtl1_left_edge$chrom[1] & cross_S1_df$pos_cum>=cross_S1_FRE_qtl1_left_edge$pos_cum[1] & cross_S1_df$pos_cum<=cross_S1_FRE_qtl1_right_edge$pos_cum[1],]
 cross_S1_FRE_qtl1_lines_AA<-lines(cross_S1_FRE_qtl1_lines_df$pos_cum, cross_S1_FRE_qtl1_lines_df$FRE_mean_AA, col="black", lwd=0)
 cross_S1_FRE_qtl1_lines_BB<-lines(cross_S1_FRE_qtl1_lines_df$pos_cum, cross_S1_FRE_qtl1_lines_df$FRE_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_S1_FRE_qtl1_lines_df$pos_cum, rev(cross_S1_FRE_qtl1_lines_df$pos_cum)), y=c(cross_S1_FRE_qtl1_lines_df$FRE_mean_BB, rev(cross_S1_FRE_qtl1_lines_df$FRE_mean_AA)),  col=rgb(0,0,1.0,alpha=0.5), lty=0)
+polygon(x=c(cross_S1_FRE_qtl1_lines_df$pos_cum, rev(cross_S1_FRE_qtl1_lines_df$pos_cum)), y=c(cross_S1_FRE_qtl1_lines_df$FRE_mean_BB, rev(cross_S1_FRE_qtl1_lines_df$FRE_mean_AA)),  col=rgb_FRE, lty=0)
 
-abline(v=cross_S1_FRE_qtl1_right_edge$pos_cum, col="blue", lty=2, lwd=2)
+abline(v=cross_S1_FRE_qtl1_right_edge$pos_cum, col=col_FRE, lty=2, lwd=2)
 
 abline(h=mean(phenotypes_S1$FRE), lty=2)
 abline(v=genome_info_df$cum_size)
 for(chr_i in 1:8){
-  lines(cross_S1_df$pos_cum[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], cross_S1_df$FRE_mean_AA[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], col="red", lwd=2)
+  lines(cross_S1_df$pos_cum[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], cross_S1_df$FRE_mean_AA[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], col=col_AA, lwd=2)
   lines(cross_S1_df$pos_cum[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], cross_S1_df$FRE_mean_AB[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], lwd=2)
-  lines(cross_S1_df$pos_cum[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], cross_S1_df$FRE_mean_BB[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], col="blue", lwd=2) 
+  lines(cross_S1_df$pos_cum[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], cross_S1_df$FRE_mean_BB[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], col=col_BB, lwd=2) 
 }
 
 
@@ -389,8 +402,8 @@ cross_S1_MRE_qtl2_right_edge<-cross_S1_df[as.character(cross_S1_df$id)==as.chara
 cross_S1_MRE_qtl2_lines_df<-cross_S1_df[as.character(cross_S1_df$chrom)==cross_S1_MRE_qtl2_left_edge$chrom[1] & cross_S1_df$pos_cum>=cross_S1_MRE_qtl2_left_edge$pos_cum[1] & cross_S1_df$pos_cum<=cross_S1_MRE_qtl2_right_edge$pos_cum[1],]
 cross_S1_MRE_qtl2_lines_AA<-lines(cross_S1_MRE_qtl2_lines_df$pos_cum, cross_S1_MRE_qtl2_lines_df$MRE_mean_AA, col="black", lwd=0)
 cross_S1_MRE_qtl2_lines_BB<-lines(cross_S1_MRE_qtl2_lines_df$pos_cum, cross_S1_MRE_qtl2_lines_df$MRE_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_S1_MRE_qtl2_lines_df$pos_cum, rev(cross_S1_MRE_qtl2_lines_df$pos_cum)), y=c(cross_S1_MRE_qtl2_lines_df$MRE_mean_BB, rev(cross_S1_MRE_qtl2_lines_df$MRE_mean_AA)),  col=rgb(1,0,0.0,alpha=0.5), lty=0)
-abline(v=cross_S1_MRE_qtl2_center$pos_cum, col="red", lty=2, lwd=2)
+polygon(x=c(cross_S1_MRE_qtl2_lines_df$pos_cum, rev(cross_S1_MRE_qtl2_lines_df$pos_cum)), y=c(cross_S1_MRE_qtl2_lines_df$MRE_mean_BB, rev(cross_S1_MRE_qtl2_lines_df$MRE_mean_AA)),  col=rgb_MRE, lty=0)
+abline(v=cross_S1_MRE_qtl2_center$pos_cum, col=col_MRE, lty=2, lwd=2)
 
 
 
@@ -401,15 +414,15 @@ cross_S1_MRE_qtl3_right_edge<-cross_S1_df[as.character(cross_S1_df$id)==as.chara
 cross_S1_MRE_qtl3_lines_df<-cross_S1_df[as.character(cross_S1_df$chrom)==cross_S1_MRE_qtl3_left_edge$chrom[1] & cross_S1_df$pos_cum>=cross_S1_MRE_qtl3_left_edge$pos_cum[1] & cross_S1_df$pos_cum<=cross_S1_MRE_qtl3_right_edge$pos_cum[1],]
 cross_S1_MRE_qtl3_lines_AA<-lines(cross_S1_MRE_qtl3_lines_df$pos_cum, cross_S1_MRE_qtl3_lines_df$MRE_mean_AA, col="black", lwd=0)
 cross_S1_MRE_qtl3_lines_BB<-lines(cross_S1_MRE_qtl3_lines_df$pos_cum, cross_S1_MRE_qtl3_lines_df$MRE_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_S1_MRE_qtl3_lines_df$pos_cum, rev(cross_S1_MRE_qtl3_lines_df$pos_cum)), y=c(cross_S1_MRE_qtl3_lines_df$MRE_mean_BB, rev(cross_S1_MRE_qtl3_lines_df$MRE_mean_AA)),  col=rgb(1,0,0.0,alpha=0.5), lty=0)
-abline(v=cross_S1_MRE_qtl3_center$pos_cum, col="red", lty=2, lwd=2)
+polygon(x=c(cross_S1_MRE_qtl3_lines_df$pos_cum, rev(cross_S1_MRE_qtl3_lines_df$pos_cum)), y=c(cross_S1_MRE_qtl3_lines_df$MRE_mean_BB, rev(cross_S1_MRE_qtl3_lines_df$MRE_mean_AA)),  col=rgb_MRE, lty=0)
+abline(v=cross_S1_MRE_qtl3_center$pos_cum, col=col_MRE, lty=2, lwd=2)
 abline(h=mean(phenotypes_S1$MRE), lty=2)
 abline(v=genome_info_df$cum_size)
 
 for(chr_i in 1:8){
-  lines(cross_S1_df$pos_cum[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], cross_S1_df$MRE_mean_AA[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], col="red", lwd=2)
+  lines(cross_S1_df$pos_cum[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], cross_S1_df$MRE_mean_AA[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], col=col_AA, lwd=2)
   lines(cross_S1_df$pos_cum[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], cross_S1_df$MRE_mean_AB[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], lwd=2)
-  lines(cross_S1_df$pos_cum[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], cross_S1_df$MRE_mean_BB[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], col="blue", lwd=2) 
+  lines(cross_S1_df$pos_cum[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], cross_S1_df$MRE_mean_BB[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], col=col_BB, lwd=2) 
 }
 
 #rMA
@@ -426,8 +439,8 @@ cross_S1_rMA_qtl4_lines_df<-cross_S1_df[as.character(cross_S1_df$chrom)==cross_S
 cross_S1_rMA_qtl4_lines_AA<-lines(cross_S1_rMA_qtl4_lines_df$pos_cum, cross_S1_rMA_qtl4_lines_df$rMA_mean_AA, col="black", lwd=0)
 cross_S1_rMA_qtl4_lines_BB<-lines(cross_S1_rMA_qtl4_lines_df$pos_cum, cross_S1_rMA_qtl4_lines_df$rMA_mean_BB, col="black", lwd=0)
 polygon(x=c(cross_S1_rMA_qtl4_lines_df$pos_cum, rev(cross_S1_rMA_qtl4_lines_df$pos_cum)), y=c(cross_S1_rMA_qtl4_lines_df$rMA_mean_BB, rev(cross_S1_rMA_qtl4_lines_df$rMA_mean_AA)),  
-        col=rgb(0,1,0.5,alpha=0.5), lty=0)
-abline(v=cross_S1_rMA_qtl4_center$pos_cum, col="darkgreen", lty=2, lwd=2)
+        col=rgb_rMA, lty=0)
+abline(v=cross_S1_rMA_qtl4_center$pos_cum, col=col_rMA, lty=2, lwd=2)
 
 
 
@@ -438,17 +451,17 @@ cross_S1_rMA_qtl5_right_edge<-cross_S1_df[as.character(cross_S1_df$id)==as.chara
 cross_S1_rMA_qtl5_lines_df<-cross_S1_df[as.character(cross_S1_df$chrom)==cross_S1_rMA_qtl5_left_edge$chrom[1] & cross_S1_df$pos_cum>=cross_S1_rMA_qtl5_left_edge$pos_cum[1] & cross_S1_df$pos_cum<=cross_S1_rMA_qtl5_right_edge$pos_cum[1],]
 cross_S1_rMA_qtl5_lines_AA<-lines(cross_S1_rMA_qtl5_lines_df$pos_cum, cross_S1_rMA_qtl5_lines_df$rMA_mean_AA, col="black", lwd=0)
 cross_S1_rMA_qtl5_lines_BB<-lines(cross_S1_rMA_qtl5_lines_df$pos_cum, cross_S1_rMA_qtl5_lines_df$rMA_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_S1_rMA_qtl5_lines_df$pos_cum, rev(cross_S1_rMA_qtl5_lines_df$pos_cum)), y=c(cross_S1_rMA_qtl5_lines_df$rMA_mean_BB, rev(cross_S1_rMA_qtl5_lines_df$rMA_mean_AA)),  col=rgb(0,1,0.5,alpha=0.5), lty=0)
-abline(v=cross_S1_rMA_qtl5_center$pos_cum, col="darkgreen", lty=2, lwd=2)
+polygon(x=c(cross_S1_rMA_qtl5_lines_df$pos_cum, rev(cross_S1_rMA_qtl5_lines_df$pos_cum)), y=c(cross_S1_rMA_qtl5_lines_df$rMA_mean_BB, rev(cross_S1_rMA_qtl5_lines_df$rMA_mean_AA)),  col=rgb_rMA, lty=0)
+abline(v=cross_S1_rMA_qtl5_center$pos_cum, col=col_rMA, lty=2, lwd=2)
 
 abline(h=mean(phenotypes_S1$rMA), lty=2)
 abline(v=genome_info_df$cum_size)
 
 
 for(chr_i in 1:8){
-  lines(cross_S1_df$pos_cum[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], cross_S1_df$rMA_mean_AA[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], col="red", lwd=2)
+  lines(cross_S1_df$pos_cum[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], cross_S1_df$rMA_mean_AA[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], col=col_AA, lwd=2)
   lines(cross_S1_df$pos_cum[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], cross_S1_df$rMA_mean_AB[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], lwd=2)
-  lines(cross_S1_df$pos_cum[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], cross_S1_df$rMA_mean_BB[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], col="blue", lwd=2) 
+  lines(cross_S1_df$pos_cum[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], cross_S1_df$rMA_mean_BB[cross_S1_df$chrom==genome_info_df$Lg[chr_i]], col=col_BB, lwd=2) 
 }
 
 #plot segregation distortion
@@ -565,9 +578,9 @@ cross_3A_FRE_qtl1_right_edge<-cross_3A_df[as.character(cross_3A_df$id)==as.chara
 cross_3A_FRE_qtl1_lines_df<-cross_3A_df[as.character(cross_3A_df$chrom)==cross_3A_FRE_qtl1_left_edge$chrom[1] & cross_3A_df$pos_cum>=cross_3A_FRE_qtl1_left_edge$pos_cum[1] & cross_3A_df$pos_cum<=cross_3A_FRE_qtl1_right_edge$pos_cum[1],]
 cross_3A_FRE_qtl1_lines_AA<-lines(cross_3A_FRE_qtl1_lines_df$pos_cum, cross_3A_FRE_qtl1_lines_df$FRE_mean_AA, col="black", lwd=0)
 cross_3A_FRE_qtl1_lines_BB<-lines(cross_3A_FRE_qtl1_lines_df$pos_cum, cross_3A_FRE_qtl1_lines_df$FRE_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_3A_FRE_qtl1_lines_df$pos_cum, rev(cross_3A_FRE_qtl1_lines_df$pos_cum)), y=c(cross_3A_FRE_qtl1_lines_df$FRE_mean_BB, rev(cross_3A_FRE_qtl1_lines_df$FRE_mean_AA)),  col=rgb(0,0,1.0,alpha=0.5), lty=0)
+polygon(x=c(cross_3A_FRE_qtl1_lines_df$pos_cum, rev(cross_3A_FRE_qtl1_lines_df$pos_cum)), y=c(cross_3A_FRE_qtl1_lines_df$FRE_mean_BB, rev(cross_3A_FRE_qtl1_lines_df$FRE_mean_AA)),  col=rgb_FRE, lty=0)
 
-abline(v=cross_3A_FRE_qtl1_center$pos_cum, col="blue", lty=2, lwd=2)
+abline(v=cross_3A_FRE_qtl1_center$pos_cum, col=col_FRE, lty=2, lwd=2)
 
 
 #QTL2
@@ -578,20 +591,20 @@ cross_3A_FRE_qtl2_lines_df<-cross_3A_df[as.character(cross_3A_df$chrom)==cross_3
 cross_3A_FRE_qtl2_lines_AA<-lines(cross_3A_FRE_qtl2_lines_df$pos_cum, cross_3A_FRE_qtl2_lines_df$FRE_mean_AA, col="black", lwd=0)
 cross_3A_FRE_qtl2_lines_BB<-lines(cross_3A_FRE_qtl2_lines_df$pos_cum, cross_3A_FRE_qtl2_lines_df$FRE_mean_BB, col="black", lwd=0)
 polygon(x=c(cross_3A_FRE_qtl2_lines_df$pos_cum, rev(cross_3A_FRE_qtl2_lines_df$pos_cum)), y=c(cross_3A_FRE_qtl2_lines_df$FRE_mean_AB, rev(cross_3A_FRE_qtl2_lines_df$FRE_mean_AA)),  
-        col=rgb(0,0,1.0,alpha=0.5),          
+        col=rgb_FRE,          
         lty=1,
         density=30,
         angle=45)
 
-abline(v=cross_3A_FRE_qtl2_center$pos_cum, col="blue", lty=2, lwd=2)
+abline(v=cross_3A_FRE_qtl2_center$pos_cum, col=col_FRE, lty=2, lwd=2)
 
 
 abline(h=mean(phenotypes_3A$FRE), lty=2)
 abline(v=genome_info_df$cum_size)
 for(chr_i in 1:8){
-  lines(cross_3A_df$pos_cum[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], cross_3A_df$FRE_mean_AA[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], col="red", lwd=2)
+  lines(cross_3A_df$pos_cum[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], cross_3A_df$FRE_mean_AA[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], col=col_AA, lwd=2)
   lines(cross_3A_df$pos_cum[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], cross_3A_df$FRE_mean_AB[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], lwd=2)
-  lines(cross_3A_df$pos_cum[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], cross_3A_df$FRE_mean_BB[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], col="blue", lwd=2) 
+  lines(cross_3A_df$pos_cum[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], cross_3A_df$FRE_mean_BB[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], col=col_BB, lwd=2) 
 }
 #MRE
 plot(cross_3A_df$pos[cross_3A_df$chrom=="OW569319.1"], cross_3A_df$MRE_mean_AA[cross_3A_df$chrom=="OW569319.1"], cex=0, xlim=c(0, sum(genome_info_df$size)), 
@@ -600,9 +613,9 @@ plot(cross_3A_df$pos[cross_3A_df$chrom=="OW569319.1"], cross_3A_df$MRE_mean_AA[c
 abline(h=mean(phenotypes_3A$MRE), lty=2)
 abline(v=genome_info_df$cum_size)
 for(chr_i in 1:8){
-  lines(cross_3A_df$pos_cum[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], cross_3A_df$MRE_mean_AA[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], col="red", lwd=2)
+  lines(cross_3A_df$pos_cum[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], cross_3A_df$MRE_mean_AA[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], col=col_AA, lwd=2)
   lines(cross_3A_df$pos_cum[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], cross_3A_df$MRE_mean_AB[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], lwd=2)
-  lines(cross_3A_df$pos_cum[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], cross_3A_df$MRE_mean_BB[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], col="blue", lwd=2) 
+  lines(cross_3A_df$pos_cum[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], cross_3A_df$MRE_mean_BB[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], col=col_BB, lwd=2) 
 }
 #rMA
 plot(cross_3A_df$pos[cross_3A_df$chrom=="OW569319.1"], cross_3A_df$rMA_mean_AA[cross_3A_df$chrom=="OW569319.1"], cex=0, xlim=c(0, sum(genome_info_df$size)), 
@@ -611,9 +624,9 @@ plot(cross_3A_df$pos[cross_3A_df$chrom=="OW569319.1"], cross_3A_df$rMA_mean_AA[c
 abline(h=mean(phenotypes_3A$rMA), lty=2)
 abline(v=genome_info_df$cum_size)
 for(chr_i in 1:8){
-  lines(cross_3A_df$pos_cum[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], cross_3A_df$rMA_mean_AA[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], col="red", lwd=2)
+  lines(cross_3A_df$pos_cum[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], cross_3A_df$rMA_mean_AA[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], col=col_AA, lwd=2)
   lines(cross_3A_df$pos_cum[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], cross_3A_df$rMA_mean_AB[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], lwd=2)
-  lines(cross_3A_df$pos_cum[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], cross_3A_df$rMA_mean_BB[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], col="blue", lwd=2) 
+  lines(cross_3A_df$pos_cum[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], cross_3A_df$rMA_mean_BB[cross_3A_df$chrom==genome_info_df$Lg[chr_i]], col=col_BB, lwd=2) 
 }
 
 #plot segregation distortion
@@ -723,9 +736,9 @@ cross_5A_FRE_qtl1_right_edge<-cross_5A_df[as.character(cross_5A_df$id)==as.chara
 cross_5A_FRE_qtl1_lines_df<-cross_5A_df[as.character(cross_5A_df$chrom)==cross_5A_FRE_qtl1_left_edge$chrom[1] & cross_5A_df$pos_cum>=cross_5A_FRE_qtl1_left_edge$pos_cum[1] & cross_5A_df$pos_cum<=cross_5A_FRE_qtl1_right_edge$pos_cum[1],]
 cross_5A_FRE_qtl1_lines_AA<-lines(cross_5A_FRE_qtl1_lines_df$pos_cum, cross_5A_FRE_qtl1_lines_df$FRE_mean_AA, col="black", lwd=0)
 cross_5A_FRE_qtl1_lines_BB<-lines(cross_5A_FRE_qtl1_lines_df$pos_cum, cross_5A_FRE_qtl1_lines_df$FRE_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_5A_FRE_qtl1_lines_df$pos_cum, rev(cross_5A_FRE_qtl1_lines_df$pos_cum)), y=c(cross_5A_FRE_qtl1_lines_df$FRE_mean_BB, rev(cross_5A_FRE_qtl1_lines_df$FRE_mean_AA)),  col=rgb(0,0,1.0,alpha=0.5), lty=0)
+polygon(x=c(cross_5A_FRE_qtl1_lines_df$pos_cum, rev(cross_5A_FRE_qtl1_lines_df$pos_cum)), y=c(cross_5A_FRE_qtl1_lines_df$FRE_mean_BB, rev(cross_5A_FRE_qtl1_lines_df$FRE_mean_AA)),  col=rgb_FRE, lty=0)
 
-abline(v=cross_5A_FRE_qtl1_center$pos_cum, col="blue", lty=2, lwd=2)
+abline(v=cross_5A_FRE_qtl1_center$pos_cum, col=col_FRE, lty=2, lwd=2)
 
 
 #QTL2 -lg7
@@ -735,9 +748,9 @@ cross_5A_FRE_qtl2_right_edge<-cross_5A_df[as.character(cross_5A_df$id)==as.chara
 cross_5A_FRE_qtl2_lines_df<-cross_5A_df[as.character(cross_5A_df$chrom)==cross_5A_FRE_qtl2_left_edge$chrom[1] & cross_5A_df$pos_cum>=cross_5A_FRE_qtl2_left_edge$pos_cum[1] & cross_5A_df$pos_cum<=cross_5A_FRE_qtl2_right_edge$pos_cum[1],]
 cross_5A_FRE_qtl2_lines_AA<-lines(cross_5A_FRE_qtl2_lines_df$pos_cum, cross_5A_FRE_qtl2_lines_df$FRE_mean_AA, col="black", lwd=0)
 cross_5A_FRE_qtl2_lines_BB<-lines(cross_5A_FRE_qtl2_lines_df$pos_cum, cross_5A_FRE_qtl2_lines_df$FRE_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_5A_FRE_qtl2_lines_df$pos_cum, rev(cross_5A_FRE_qtl2_lines_df$pos_cum)), y=c(cross_5A_FRE_qtl2_lines_df$FRE_mean_BB, rev(cross_5A_FRE_qtl2_lines_df$FRE_mean_AA)),  col=rgb(0,0,1.0,alpha=0.5), lty=0)
+polygon(x=c(cross_5A_FRE_qtl2_lines_df$pos_cum, rev(cross_5A_FRE_qtl2_lines_df$pos_cum)), y=c(cross_5A_FRE_qtl2_lines_df$FRE_mean_BB, rev(cross_5A_FRE_qtl2_lines_df$FRE_mean_AA)),  col=rgb_FRE, lty=0)
 
-abline(v=cross_5A_FRE_qtl2_center$pos_cum, col="blue", lty=2, lwd=2)
+abline(v=cross_5A_FRE_qtl2_center$pos_cum, col=col_FRE, lty=2, lwd=2)
 
 
 
@@ -751,12 +764,12 @@ cross_5A_FRE_qtl3_lines_df<-cross_5A_df[as.character(cross_5A_df$chrom)==cross_5
 cross_5A_FRE_qtl3_lines_AA<-lines(cross_5A_FRE_qtl3_lines_df$pos_cum, cross_5A_FRE_qtl3_lines_df$FRE_mean_AA, col="black", lwd=0)
 cross_5A_FRE_qtl3_lines_BB<-lines(cross_5A_FRE_qtl3_lines_df$pos_cum, cross_5A_FRE_qtl3_lines_df$FRE_mean_BB, col="black", lwd=0)
 polygon(x=c(cross_5A_FRE_qtl3_lines_df$pos_cum, rev(cross_5A_FRE_qtl3_lines_df$pos_cum)), y=c(cross_5A_FRE_qtl3_lines_df$FRE_mean_AB, rev(cross_5A_FRE_qtl3_lines_df$FRE_mean_AA)),  
-        col=rgb(0,0,1.0,alpha=0.5), 
+        col=rgb_FRE, 
         lty=1,
         density=30,
         angle=45)
 
-abline(v=cross_5A_FRE_qtl3_center$pos_cum, col="blue", lty=2, lwd=2)
+abline(v=cross_5A_FRE_qtl3_center$pos_cum, col=col_FRE, lty=2, lwd=2)
 
 
 #QTL4 - lg 8 one qtl
@@ -766,19 +779,19 @@ cross_5A_FRE_qtl4_right_edge<-cross_5A_df[as.character(cross_5A_df$id)==as.chara
 cross_5A_FRE_qtl4_lines_df<-cross_5A_df[as.character(cross_5A_df$chrom)==cross_5A_FRE_qtl4_left_edge$chrom[1] & cross_5A_df$pos_cum>=cross_5A_FRE_qtl4_left_edge$pos_cum[1] & cross_5A_df$pos_cum<=cross_5A_FRE_qtl4_right_edge$pos_cum[1],]
 cross_5A_FRE_qtl4_lines_AA<-lines(cross_5A_FRE_qtl4_lines_df$pos_cum, cross_5A_FRE_qtl4_lines_df$FRE_mean_AA, col="black", lwd=0)
 cross_5A_FRE_qtl4_lines_BB<-lines(cross_5A_FRE_qtl4_lines_df$pos_cum, cross_5A_FRE_qtl4_lines_df$FRE_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_5A_FRE_qtl4_lines_df$pos_cum, rev(cross_5A_FRE_qtl4_lines_df$pos_cum)), y=c(cross_5A_FRE_qtl4_lines_df$FRE_mean_AB, rev(cross_5A_FRE_qtl4_lines_df$FRE_mean_AA)),  col=rgb(0,0,1.0,alpha=0.5),
+polygon(x=c(cross_5A_FRE_qtl4_lines_df$pos_cum, rev(cross_5A_FRE_qtl4_lines_df$pos_cum)), y=c(cross_5A_FRE_qtl4_lines_df$FRE_mean_AB, rev(cross_5A_FRE_qtl4_lines_df$FRE_mean_AA)),  col=rgb_FRE,
         lty=1,
         density=30,
         angle=45)
 
-abline(v=cross_5A_FRE_qtl4_center$pos_cum, col="blue", lty=2, lwd=2)
+abline(v=cross_5A_FRE_qtl4_center$pos_cum, col=col_FRE, lty=2, lwd=2)
 
 abline(h=mean(phenotypes_5A$FRE), lty=2)
 abline(v=genome_info_df$cum_size)
 for(chr_i in 1:8){
-  lines(cross_5A_df$pos_cum[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], cross_5A_df$FRE_mean_AA[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], col="red", lwd=2)
+  lines(cross_5A_df$pos_cum[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], cross_5A_df$FRE_mean_AA[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], col=col_AA, lwd=2)
   lines(cross_5A_df$pos_cum[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], cross_5A_df$FRE_mean_AB[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], lwd=2)
-  lines(cross_5A_df$pos_cum[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], cross_5A_df$FRE_mean_BB[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], col="blue", lwd=2) 
+  lines(cross_5A_df$pos_cum[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], cross_5A_df$FRE_mean_BB[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], col=col_BB, lwd=2) 
 }
 
 
@@ -798,9 +811,9 @@ cross_5A_MRE_qtl1_right_edge<-cross_5A_df[as.character(cross_5A_df$id)==as.chara
 cross_5A_MRE_qtl1_lines_df<-cross_5A_df[as.character(cross_5A_df$chrom)==cross_5A_MRE_qtl1_left_edge$chrom[1] & cross_5A_df$pos_cum>=cross_5A_MRE_qtl1_left_edge$pos_cum[1] & cross_5A_df$pos_cum<=cross_5A_MRE_qtl1_right_edge$pos_cum[1],]
 cross_5A_MRE_qtl1_lines_AA<-lines(cross_5A_MRE_qtl1_lines_df$pos_cum, cross_5A_MRE_qtl1_lines_df$MRE_mean_AA, col="black", lwd=0)
 cross_5A_MRE_qtl1_lines_BB<-lines(cross_5A_MRE_qtl1_lines_df$pos_cum, cross_5A_MRE_qtl1_lines_df$MRE_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_5A_MRE_qtl1_lines_df$pos_cum, rev(cross_5A_MRE_qtl1_lines_df$pos_cum)), y=c(cross_5A_MRE_qtl1_lines_df$MRE_mean_BB, rev(cross_5A_MRE_qtl1_lines_df$MRE_mean_AA)),  col=rgb(1,0,0.0,alpha=0.5), lty=0)
+polygon(x=c(cross_5A_MRE_qtl1_lines_df$pos_cum, rev(cross_5A_MRE_qtl1_lines_df$pos_cum)), y=c(cross_5A_MRE_qtl1_lines_df$MRE_mean_BB, rev(cross_5A_MRE_qtl1_lines_df$MRE_mean_AA)),  col=rgb_MRE, lty=0)
 
-abline(v=cross_5A_MRE_qtl1_center$pos_cum, col="red", lty=2, lwd=2)
+abline(v=cross_5A_MRE_qtl1_center$pos_cum, col=col_MRE, lty=2, lwd=2)
 
 
 #qtl2
@@ -810,9 +823,9 @@ cross_5A_MRE_qtl2_right_edge<-cross_5A_df[as.character(cross_5A_df$id)==as.chara
 cross_5A_MRE_qtl2_lines_df<-cross_5A_df[as.character(cross_5A_df$chrom)==cross_5A_MRE_qtl2_left_edge$chrom[1] & cross_5A_df$pos_cum>=cross_5A_MRE_qtl2_left_edge$pos_cum[1] & cross_5A_df$pos_cum<=cross_5A_MRE_qtl2_right_edge$pos_cum[1],]
 cross_5A_MRE_qtl2_lines_AA<-lines(cross_5A_MRE_qtl2_lines_df$pos_cum, cross_5A_MRE_qtl2_lines_df$MRE_mean_AA, col="black", lwd=0)
 cross_5A_MRE_qtl2_lines_BB<-lines(cross_5A_MRE_qtl2_lines_df$pos_cum, cross_5A_MRE_qtl2_lines_df$MRE_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_5A_MRE_qtl2_lines_df$pos_cum, rev(cross_5A_MRE_qtl2_lines_df$pos_cum)), y=c(cross_5A_MRE_qtl2_lines_df$MRE_mean_BB, rev(cross_5A_MRE_qtl2_lines_df$MRE_mean_AB)),  col=rgb(1,0,0.0,alpha=0.5), lty=0)
+polygon(x=c(cross_5A_MRE_qtl2_lines_df$pos_cum, rev(cross_5A_MRE_qtl2_lines_df$pos_cum)), y=c(cross_5A_MRE_qtl2_lines_df$MRE_mean_BB, rev(cross_5A_MRE_qtl2_lines_df$MRE_mean_AB)),  col=rgb_MRE, lty=0)
 
-abline(v=cross_5A_MRE_qtl2_center$pos_cum, col="red", lty=2, lwd=2)
+abline(v=cross_5A_MRE_qtl2_center$pos_cum, col=col_MRE, lty=2, lwd=2)
 
 
 #qtl3
@@ -822,9 +835,9 @@ cross_5A_MRE_qtl3_right_edge<-cross_5A_df[as.character(cross_5A_df$id)==as.chara
 cross_5A_MRE_qtl3_lines_df<-cross_5A_df[as.character(cross_5A_df$chrom)==cross_5A_MRE_qtl3_left_edge$chrom[1] & cross_5A_df$pos_cum>=cross_5A_MRE_qtl3_left_edge$pos_cum[1] & cross_5A_df$pos_cum<=cross_5A_MRE_qtl3_right_edge$pos_cum[1],]
 cross_5A_MRE_qtl3_lines_AA<-lines(cross_5A_MRE_qtl3_lines_df$pos_cum, cross_5A_MRE_qtl3_lines_df$MRE_mean_AA, col="black", lwd=0)
 cross_5A_MRE_qtl3_lines_BB<-lines(cross_5A_MRE_qtl3_lines_df$pos_cum, cross_5A_MRE_qtl3_lines_df$MRE_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_5A_MRE_qtl3_lines_df$pos_cum, rev(cross_5A_MRE_qtl3_lines_df$pos_cum)), y=c(cross_5A_MRE_qtl3_lines_df$MRE_mean_BB, rev(cross_5A_MRE_qtl3_lines_df$MRE_mean_AA)),  col=rgb(1,0,0.0,alpha=0.5), lty=0)
+polygon(x=c(cross_5A_MRE_qtl3_lines_df$pos_cum, rev(cross_5A_MRE_qtl3_lines_df$pos_cum)), y=c(cross_5A_MRE_qtl3_lines_df$MRE_mean_BB, rev(cross_5A_MRE_qtl3_lines_df$MRE_mean_AA)),  col=rgb_MRE, lty=0)
 
-abline(v=cross_5A_MRE_qtl3_center$pos_cum, col="red", lty=2, lwd=2)
+abline(v=cross_5A_MRE_qtl3_center$pos_cum, col=col_MRE, lty=2, lwd=2)
 
 
 #qtl4
@@ -834,9 +847,9 @@ cross_5A_MRE_qtl4_right_edge<-cross_5A_df[as.character(cross_5A_df$id)==as.chara
 cross_5A_MRE_qtl4_lines_df<-cross_5A_df[as.character(cross_5A_df$chrom)==cross_5A_MRE_qtl4_left_edge$chrom[1] & cross_5A_df$pos_cum>=cross_5A_MRE_qtl4_left_edge$pos_cum[1] & cross_5A_df$pos_cum<=cross_5A_MRE_qtl4_right_edge$pos_cum[1],]
 cross_5A_MRE_qtl4_lines_AA<-lines(cross_5A_MRE_qtl4_lines_df$pos_cum, cross_5A_MRE_qtl4_lines_df$MRE_mean_AA, col="black", lwd=0)
 cross_5A_MRE_qtl4_lines_BB<-lines(cross_5A_MRE_qtl4_lines_df$pos_cum, cross_5A_MRE_qtl4_lines_df$MRE_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_5A_MRE_qtl4_lines_df$pos_cum, rev(cross_5A_MRE_qtl4_lines_df$pos_cum)), y=c(cross_5A_MRE_qtl4_lines_df$MRE_mean_BB, rev(cross_5A_MRE_qtl4_lines_df$MRE_mean_AA)),  col=rgb(1,0,0.0,alpha=0.5), lty=0)
+polygon(x=c(cross_5A_MRE_qtl4_lines_df$pos_cum, rev(cross_5A_MRE_qtl4_lines_df$pos_cum)), y=c(cross_5A_MRE_qtl4_lines_df$MRE_mean_BB, rev(cross_5A_MRE_qtl4_lines_df$MRE_mean_AA)),  col=rgb_MRE, lty=0)
 
-abline(v=cross_5A_MRE_qtl4_center$pos_cum, col="red", lty=2, lwd=2)
+abline(v=cross_5A_MRE_qtl4_center$pos_cum, col=col_MRE, lty=2, lwd=2)
 
 
 #qtl5
@@ -846,18 +859,18 @@ cross_5A_MRE_qtl5_right_edge<-cross_5A_df[as.character(cross_5A_df$id)==as.chara
 cross_5A_MRE_qtl5_lines_df<-cross_5A_df[as.character(cross_5A_df$chrom)==cross_5A_MRE_qtl5_left_edge$chrom[1] & cross_5A_df$pos_cum>=cross_5A_MRE_qtl5_left_edge$pos_cum[1] & cross_5A_df$pos_cum<=cross_5A_MRE_qtl5_right_edge$pos_cum[1],]
 cross_5A_MRE_qtl5_lines_AA<-lines(cross_5A_MRE_qtl5_lines_df$pos_cum, cross_5A_MRE_qtl5_lines_df$MRE_mean_AA, col="black", lwd=0)
 cross_5A_MRE_qtl5_lines_BB<-lines(cross_5A_MRE_qtl5_lines_df$pos_cum, cross_5A_MRE_qtl5_lines_df$MRE_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_5A_MRE_qtl5_lines_df$pos_cum, rev(cross_5A_MRE_qtl5_lines_df$pos_cum)), y=c(cross_5A_MRE_qtl5_lines_df$MRE_mean_BB, rev(cross_5A_MRE_qtl5_lines_df$MRE_mean_AA)),  col=rgb(1,0,0.0,alpha=0.5), lty=0)
+polygon(x=c(cross_5A_MRE_qtl5_lines_df$pos_cum, rev(cross_5A_MRE_qtl5_lines_df$pos_cum)), y=c(cross_5A_MRE_qtl5_lines_df$MRE_mean_BB, rev(cross_5A_MRE_qtl5_lines_df$MRE_mean_AA)),  col=rgb_MRE, lty=0)
 
-abline(v=cross_5A_MRE_qtl5_center$pos_cum, col="red", lty=2, lwd=2)
+abline(v=cross_5A_MRE_qtl5_center$pos_cum, col=col_MRE, lty=2, lwd=2)
 
 
 
 abline(h=mean(phenotypes_5A$MRE), lty=2)
 abline(v=genome_info_df$cum_size)
 for(chr_i in 1:8){
-  lines(cross_5A_df$pos_cum[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], cross_5A_df$MRE_mean_AA[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], col="red", lwd=2)
+  lines(cross_5A_df$pos_cum[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], cross_5A_df$MRE_mean_AA[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], col=col_AA, lwd=2)
   lines(cross_5A_df$pos_cum[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], cross_5A_df$MRE_mean_AB[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], lwd=2)
-  lines(cross_5A_df$pos_cum[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], cross_5A_df$MRE_mean_BB[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], col="blue", lwd=2) 
+  lines(cross_5A_df$pos_cum[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], cross_5A_df$MRE_mean_BB[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], col=col_BB, lwd=2) 
 }
 
 #rMA
@@ -877,9 +890,9 @@ cross_5A_rMA_qtl6_right_edge<-cross_5A_df[as.character(cross_5A_df$id)==as.chara
 cross_5A_rMA_qtl6_lines_df<-cross_5A_df[as.character(cross_5A_df$chrom)==cross_5A_rMA_qtl6_left_edge$chrom[1] & cross_5A_df$pos_cum>=cross_5A_rMA_qtl6_left_edge$pos_cum[1] & cross_5A_df$pos_cum<=cross_5A_rMA_qtl6_right_edge$pos_cum[1],]
 cross_5A_rMA_qtl6_lines_AA<-lines(cross_5A_rMA_qtl6_lines_df$pos_cum, cross_5A_rMA_qtl6_lines_df$rMA_mean_AA, col="black", lwd=0)
 cross_5A_rMA_qtl6_lines_BB<-lines(cross_5A_rMA_qtl6_lines_df$pos_cum, cross_5A_rMA_qtl6_lines_df$rMA_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_5A_rMA_qtl6_lines_df$pos_cum, rev(cross_5A_rMA_qtl6_lines_df$pos_cum)), y=c(cross_5A_rMA_qtl6_lines_df$rMA_mean_AA, rev(cross_5A_rMA_qtl6_lines_df$rMA_mean_BB)),  col=rgb(0,1,0.5,alpha=0.5), lty=0)
+polygon(x=c(cross_5A_rMA_qtl6_lines_df$pos_cum, rev(cross_5A_rMA_qtl6_lines_df$pos_cum)), y=c(cross_5A_rMA_qtl6_lines_df$rMA_mean_AA, rev(cross_5A_rMA_qtl6_lines_df$rMA_mean_BB)),  col=rgb_rMA, lty=0)
 
-abline(v=cross_5A_rMA_qtl6_center$pos_cum, col="darkgreen", lty=2, lwd=2)
+abline(v=cross_5A_rMA_qtl6_center$pos_cum, col=col_rMA, lty=2, lwd=2)
 
 
 
@@ -892,9 +905,9 @@ cross_5A_rMA_qtl1_right_edge<-cross_5A_df[as.character(cross_5A_df$id)==as.chara
 cross_5A_rMA_qtl1_lines_df<-cross_5A_df[as.character(cross_5A_df$chrom)==cross_5A_rMA_qtl1_left_edge$chrom[1] & cross_5A_df$pos_cum>=cross_5A_rMA_qtl1_left_edge$pos_cum[1] & cross_5A_df$pos_cum<=cross_5A_rMA_qtl1_right_edge$pos_cum[1],]
 cross_5A_rMA_qtl1_lines_AA<-lines(cross_5A_rMA_qtl1_lines_df$pos_cum, cross_5A_rMA_qtl1_lines_df$rMA_mean_AA, col="black", lwd=0)
 cross_5A_rMA_qtl1_lines_BB<-lines(cross_5A_rMA_qtl1_lines_df$pos_cum, cross_5A_rMA_qtl1_lines_df$rMA_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_5A_rMA_qtl1_lines_df$pos_cum, rev(cross_5A_rMA_qtl1_lines_df$pos_cum)), y=c(cross_5A_rMA_qtl1_lines_df$rMA_mean_BB, rev(cross_5A_rMA_qtl1_lines_df$rMA_mean_AA)),  col=rgb(0,1,0.5,alpha=0.5), lty=0)
+polygon(x=c(cross_5A_rMA_qtl1_lines_df$pos_cum, rev(cross_5A_rMA_qtl1_lines_df$pos_cum)), y=c(cross_5A_rMA_qtl1_lines_df$rMA_mean_BB, rev(cross_5A_rMA_qtl1_lines_df$rMA_mean_AA)),  col=rgb_rMA, lty=0)
 
-abline(v=cross_5A_rMA_qtl1_center$pos_cum, col="darkgreen", lty=2, lwd=2)
+abline(v=cross_5A_rMA_qtl1_center$pos_cum, col=col_rMA, lty=2, lwd=2)
 
 
 #QTL2
@@ -904,9 +917,9 @@ cross_5A_rMA_qtl2_right_edge<-cross_5A_df[as.character(cross_5A_df$id)==as.chara
 cross_5A_rMA_qtl2_lines_df<-cross_5A_df[as.character(cross_5A_df$chrom)==cross_5A_rMA_qtl2_left_edge$chrom[1] & cross_5A_df$pos_cum>=cross_5A_rMA_qtl2_left_edge$pos_cum[1] & cross_5A_df$pos_cum<=cross_5A_rMA_qtl2_right_edge$pos_cum[1],]
 cross_5A_rMA_qtl2_lines_AA<-lines(cross_5A_rMA_qtl2_lines_df$pos_cum, cross_5A_rMA_qtl2_lines_df$rMA_mean_AA, col="black", lwd=0)
 cross_5A_rMA_qtl2_lines_BB<-lines(cross_5A_rMA_qtl2_lines_df$pos_cum, cross_5A_rMA_qtl2_lines_df$rMA_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_5A_rMA_qtl2_lines_df$pos_cum, rev(cross_5A_rMA_qtl2_lines_df$pos_cum)), y=c(cross_5A_rMA_qtl2_lines_df$rMA_mean_BB, rev(cross_5A_rMA_qtl2_lines_df$rMA_mean_AA)),  col=rgb(0,1,0.5,alpha=0.5), lty=0)
+polygon(x=c(cross_5A_rMA_qtl2_lines_df$pos_cum, rev(cross_5A_rMA_qtl2_lines_df$pos_cum)), y=c(cross_5A_rMA_qtl2_lines_df$rMA_mean_BB, rev(cross_5A_rMA_qtl2_lines_df$rMA_mean_AA)),  col=rgb_rMA, lty=0)
 
-abline(v=cross_5A_rMA_qtl2_center$pos_cum, col="darkgreen", lty=2, lwd=2)
+abline(v=cross_5A_rMA_qtl2_center$pos_cum, col=col_rMA, lty=2, lwd=2)
 
 #QTL3
 cross_5A_rMA_qtl3_left_edge<-cross_5A_df[as.character(cross_5A_df$id)==as.character(cross_5A_qtls$begin[13]),]
@@ -915,9 +928,9 @@ cross_5A_rMA_qtl3_right_edge<-cross_5A_df[as.character(cross_5A_df$id)==as.chara
 cross_5A_rMA_qtl3_lines_df<-cross_5A_df[as.character(cross_5A_df$chrom)==cross_5A_rMA_qtl3_left_edge$chrom[1] & cross_5A_df$pos_cum>=cross_5A_rMA_qtl3_left_edge$pos_cum[1] & cross_5A_df$pos_cum<=cross_5A_rMA_qtl3_right_edge$pos_cum[1],]
 cross_5A_rMA_qtl3_lines_AA<-lines(cross_5A_rMA_qtl3_lines_df$pos_cum, cross_5A_rMA_qtl3_lines_df$rMA_mean_AA, col="black", lwd=0)
 cross_5A_rMA_qtl3_lines_BB<-lines(cross_5A_rMA_qtl3_lines_df$pos_cum, cross_5A_rMA_qtl3_lines_df$rMA_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_5A_rMA_qtl3_lines_df$pos_cum, rev(cross_5A_rMA_qtl3_lines_df$pos_cum)), y=c(cross_5A_rMA_qtl3_lines_df$rMA_mean_BB, rev(cross_5A_rMA_qtl3_lines_df$rMA_mean_AA)),  col=rgb(0,1,0.5,alpha=0.5), lty=0)
+polygon(x=c(cross_5A_rMA_qtl3_lines_df$pos_cum, rev(cross_5A_rMA_qtl3_lines_df$pos_cum)), y=c(cross_5A_rMA_qtl3_lines_df$rMA_mean_BB, rev(cross_5A_rMA_qtl3_lines_df$rMA_mean_AA)),  col=rgb_rMA, lty=0)
 
-abline(v=cross_5A_rMA_qtl3_center$pos_cum, col="darkgreen", lty=2, lwd=2)
+abline(v=cross_5A_rMA_qtl3_center$pos_cum, col=col_rMA, lty=2, lwd=2)
 
 
 #QTL4
@@ -927,9 +940,9 @@ cross_5A_rMA_qtl4_right_edge<-cross_5A_df[as.character(cross_5A_df$id)==as.chara
 cross_5A_rMA_qtl4_lines_df<-cross_5A_df[as.character(cross_5A_df$chrom)==cross_5A_rMA_qtl4_left_edge$chrom[1] & cross_5A_df$pos_cum>=cross_5A_rMA_qtl4_left_edge$pos_cum[1] & cross_5A_df$pos_cum<=cross_5A_rMA_qtl4_right_edge$pos_cum[1],]
 cross_5A_rMA_qtl4_lines_AA<-lines(cross_5A_rMA_qtl4_lines_df$pos_cum, cross_5A_rMA_qtl4_lines_df$rMA_mean_AA, col="black", lwd=0)
 cross_5A_rMA_qtl4_lines_BB<-lines(cross_5A_rMA_qtl4_lines_df$pos_cum, cross_5A_rMA_qtl4_lines_df$rMA_mean_BB, col="black", lwd=0)
-polygon(x=c(cross_5A_rMA_qtl4_lines_df$pos_cum, rev(cross_5A_rMA_qtl4_lines_df$pos_cum)), y=c(cross_5A_rMA_qtl4_lines_df$rMA_mean_BB, rev(cross_5A_rMA_qtl4_lines_df$rMA_mean_AA)),  col=rgb(0,1,0.5,alpha=0.5), lty=0)
+polygon(x=c(cross_5A_rMA_qtl4_lines_df$pos_cum, rev(cross_5A_rMA_qtl4_lines_df$pos_cum)), y=c(cross_5A_rMA_qtl4_lines_df$rMA_mean_BB, rev(cross_5A_rMA_qtl4_lines_df$rMA_mean_AA)),  col=rgb_rMA, lty=0)
 
-abline(v=cross_5A_rMA_qtl4_center$pos_cum, col="darkgreen", lty=2, lwd=2)
+abline(v=cross_5A_rMA_qtl4_center$pos_cum, col=col_rMA, lty=2, lwd=2)
 
 
 #QTL5
@@ -940,20 +953,20 @@ cross_5A_rMA_qtl5_lines_df<-cross_5A_df[as.character(cross_5A_df$chrom)==cross_5
 cross_5A_rMA_qtl5_lines_AA<-lines(cross_5A_rMA_qtl5_lines_df$pos_cum, cross_5A_rMA_qtl5_lines_df$rMA_mean_AA, col="black", lwd=0)
 cross_5A_rMA_qtl5_lines_BB<-lines(cross_5A_rMA_qtl5_lines_df$pos_cum, cross_5A_rMA_qtl5_lines_df$rMA_mean_BB, col="black", lwd=0)
 polygon(x=c(cross_5A_rMA_qtl5_lines_df$pos_cum, rev(cross_5A_rMA_qtl5_lines_df$pos_cum)), y=c(cross_5A_rMA_qtl5_lines_df$rMA_mean_BB, rev(cross_5A_rMA_qtl5_lines_df$rMA_mean_AA)),
-        col=rgb(0,1,0.5,alpha=0.5), 
+        col=rgb_rMA, 
         lty=1,
         density=30,
         angle=45)
 
-abline(v=cross_5A_rMA_qtl5_center$pos_cum, col="darkgreen", lty=2, lwd=2)
+abline(v=cross_5A_rMA_qtl5_center$pos_cum, col=col_rMA, lty=2, lwd=2)
 
 
 abline(h=mean(phenotypes_5A$rMA), lty=2)
 abline(v=genome_info_df$cum_size)
 for(chr_i in 1:8){
-  lines(cross_5A_df$pos_cum[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], cross_5A_df$rMA_mean_AA[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], col="red", lwd=2)
+  lines(cross_5A_df$pos_cum[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], cross_5A_df$rMA_mean_AA[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], col=col_AA, lwd=2)
   lines(cross_5A_df$pos_cum[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], cross_5A_df$rMA_mean_AB[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], lwd=2)
-  lines(cross_5A_df$pos_cum[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], cross_5A_df$rMA_mean_BB[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], col="blue", lwd=2) 
+  lines(cross_5A_df$pos_cum[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], cross_5A_df$rMA_mean_BB[cross_5A_df$chrom==genome_info_df$Lg[chr_i]], col=col_BB, lwd=2) 
 }
 
 
